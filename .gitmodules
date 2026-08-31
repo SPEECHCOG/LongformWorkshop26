@@ -1,0 +1,9 @@
+[submodule "submodules/VTC"]
+	path = submodules/VTC
+	url = git@github.com:LAAC-LSCP/VTC.git
+[submodule "submodules/speech-maturity"]
+	path = submodules/speech-maturity
+	url = https://github.com/arxaqapi/speech-maturity
+[submodule "submodules/BabAR"]
+	path = submodules/BabAR
+	url = git@github.com:MarvinLvn/BabAR.git
