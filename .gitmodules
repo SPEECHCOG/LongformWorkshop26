@@ -7,3 +7,6 @@
 [submodule "submodules/BabAR"]
 	path = submodules/BabAR
 	url = git@github.com:MarvinLvn/BabAR.git
+[submodule "BabAR"]
+	path = BabAR
+	url = git@github.com:MarvinLvn/BabAR.git
