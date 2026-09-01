@@ -1,0 +1,10 @@
+in_paths:
+  csvs: data/vandam-data/annotations/eaf/converted
+  wavs: data/vandam-data/recordings/converted/standard
+
+vtc_params:                   # Voice Type Classifier
+  MIN_DURATION_ON_S: 0.1      # minimum length of an utterance
+  MIN_DURATION_OFF_S: 0.1     # minimum distance between two utterances of the same speaker group
+
+sm_params:                    # Speech Maturity Classifier
+  MAX_LEN: 9217               # maximum array length (~576ms)
