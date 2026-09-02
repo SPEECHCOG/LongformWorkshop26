@@ -1,6 +1,7 @@
 # Workshop on "Introduction to child-centered longform audio processing"
 
-Introduction. 
+(TODO:) Introduction. 
+
 Overview to prepare your system for tool usage:
 
 - [important notes for windows users](#windows-wsl-installation)
@@ -232,11 +233,9 @@ Note: If you would like to use your own data, please place it into the same fold
 
 You may now proceed to [long-form data processing section](#long-form-data-processing).
 
-
-
 ## Long-form data processing
 
-Let's get started with the actual data processing! If you are using the example data, you may skip the first section.
+Let's get started with the actual data processing! If you are using the example data, you may skip the first section. Every section follows the structure: 1. input: what does the tool receive? 2. output: what does the tool return? 3. parameters: what parameters can be set to modify the tool outputs? 4. code: how to run the tool.
 
 ### Data conversion
 
@@ -248,8 +247,12 @@ python code/convert_data.py                     # call the conversion script (it
 ```
 
 ### Speaker diarization
+The Voice Type Classifier (VTC) determines who speaks when in an given audio file: It performs segmentation of the recording, classifying the segments where at least one speaker is active into the broad categories of female (FEM), male (MAL), key-child (KCH), and other children's (OCH) speech.
 
-- VTC + bash script
+1. input: the tool receives...
+2. output: the tool outputs...
+3. parameters: ...
+4. code: full terminal command plus bash script command
 
 ### Child speech analysis I: Speech maturity classification
 - script to slice and throw away non-CHI for speech maturity
