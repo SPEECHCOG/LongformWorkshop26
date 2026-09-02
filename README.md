@@ -1,7 +1,7 @@
 # Workshop on "Introduction to child-centered longform audio processing"
 
 Introduction. 
-Overview to prepare for tool usage:
+Overview to prepare your system for tool usage:
 
 - [important notes for windows users](#windows-wsl-installation)
 - [technical setup](#technical-setup)
@@ -10,16 +10,40 @@ Overview to prepare for tool usage:
 
 Overview to run the tools:
 
-...
+- [data conversion](#data-conversion)
+- [Voice Type Classifier (VTC)](#speaker-diarization)
+- [Speech Maturity Classifier](#child-speech-analysis-i-speech-maturity-classification)
+- [Babbling Recognizer (BaBAR)](#child-speech-analysis-ii-babbling-recognition)
+- [Linguistic Unit Count Estimation (ALICE)](#caregiver-speech-analysis-word-count-estimation)
+
+If you use longform data analaysis tools for your research, please recognize the authors in the [references section](#references). You might want to check out our collection of [interesting links](#further-information).
 
 ## How to get started
-In this section, we walk you through necessary installations and downloads. Note that some commands vary depending on your operation system (mac / Linux / Windows). For those with a Windows system, please refer to the section [Windows WSL installation](#windows-wsl-installation)
-- cloning this repository
-- system preparations (git-lfs, ffmpeg, uv, datalad)
-- submodule init recursive
-- environment installation (uv or pip or conda)
-- data download: VanDam (standard-converted wavs plus csv-converted annotations)
-- if possible, most steps in 01_run_installations.sh, according to os
+In this section, we walk you through necessary installations and downloads. Note that some commands vary depending on your operation system (mac / Linux / Windows). If you use a Windows system, please refer to the section [Windows WSL installation](#windows-wsl-installation), otherwise proceed to [technical setup](#technical-setup).
+
+### Windows WSL installation
+Many tools for long-form processing do not work for Windows systems. Therefore, we install the Windows Subsystem for Linux (WSL). Note that some of the following steps might require administrator rights. We are following the [official Windows tutorial for WSL installation](https://learn.microsoft.com/en-us/windows/wsl/install). 
+
+1. Open PowerShell (if possible, in admin mode by right-clicking the icon and chosing 'Run as administrator'), type the following command and press enter: 
+
+```bash
+wsl --install
+```
+
+2. You will be prompted to set a UNIX password and username. Save these for later use! Then close the shell with the following command:
+
+```bash
+exit
+```
+
+3. You should now see a WSL shell icon on your desktop, or be able to find it from your search window. Open the WSL shell, or the PowerShell if you cannot find the icon. Verify the installation with the following command:
+
+```bash
+wsl                     # in case you are in PowerShell, this command switches to WSL system
+wsl --version
+```
+
+4. The above command should output information about your Linux (Ubuntu) subsystem. If everything looks fine, proceed to the [technical setup](#technical-setup) and follow the instructions for linux users.
 
 ### Technical setup
 In the following, we assume you have a macOS, Linux or WSL system. When running installation commands, you are usually prompted "install [...]. proceed? [y/n]" or similar. Answer by pressing y to proceed.
@@ -208,29 +232,7 @@ Note: If you would like to use your own data, please place it into the same fold
 
 You may now proceed to [long-form data processing section](#long-form-data-processing).
 
-### Windows WSL installation
-Many tools for long-form processing do not work for Windows systems. Therefore, we install the Windows Subsystem for Linux (WSL). Note that some of the following steps might require administrator rights. We are following the [official Windows tutorial for WSL installation](https://learn.microsoft.com/en-us/windows/wsl/install). 
 
-1. Open PowerShell (if possible, in admin mode by right-clicking the icon and chosing 'Run as administrator'), type the following command and press enter: 
-
-```bash
-wsl --install
-```
-
-2. You will be prompted to set a UNIX password and username. Save these for later use! Then close the shell with the following command:
-
-```bash
-exit
-```
-
-3. You should now see a WSL shell icon on your desktop, or be able to find it from your search window. Open the WSL shell, or the PowerShell if you cannot find the icon. Verify the installation with the following command:
-
-```bash
-wsl                     # in case you are in PowerShell, this command switches to WSL system
-wsl --version
-```
-
-4. The above command should output information about your Linux (Ubuntu) subsystem. If everything looks fine, proceed to the [technical setup](#technical-setup) and follow the instructions for linux users.
 
 ## Long-form data processing
 
