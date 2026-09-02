@@ -1,0 +1,15 @@
+name: longforms
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy=1.26.4
+  - torchaudio=2.6
+  - pandas
+  - librosa
+  - tqdm
+  - pip
+  - pip:
+      - soundfile
+      - sounddevice

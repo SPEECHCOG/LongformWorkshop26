@@ -99,7 +99,7 @@ brew install uv
 uv --version
 ````
 
-4. (b) linux / WSL users only:
+4. (b) linux / WSL users:
 
 In your terminal, you should now see "(base)" on the left before your username. Verify the installation, then proceed to install the version control tool git and its large file system git-lfs. Set your global variables and replace "myname" and "myemail" with your username or actual name and e-mail address:
 
@@ -132,10 +132,10 @@ git clone HTTPS-link                        # replace "HTTPS-link" with the actu
 This will create a folder in your current directory with the contents of the repository. Yet, we are not done by simply cloning; we also need to install the tools' requirements. Let's get started by cloning this repository:
 
 1. [LongformWorkshop26](https://github.com/SPEECHCOG/LongformWorkshop26)
+
 Different tools require different software libraries, installed with package managers. In this repository, we rely on miniconda that we installed earlier:
 
 ```bash
-cd ~/LONGFORM_TOOLS                         # navigate to LONGFORM_TOOLS directory
 git clone https://github.com/SPEECHCOG/LongformWorkshop26.git
 cd LongformWorkshop26                       # navigate to repository folder
 conda env create -f code/environment.yml    # installs the conda environment in folder code
@@ -143,6 +143,7 @@ cd ..                                       # navigates back to LONGFORM_TOOLS d
 ```
 
 2. [Voice Type Classifier](https://github.com/LAAC-LSCP/VTC/tree/main)
+
 Some repositories have linked repositories called submodules. In this case, we need to initialize those before installing the requirements. 
 
 ```bash
@@ -155,6 +156,7 @@ cd ..
 ```
 
 3. [Speech Maturity Classifier](https://github.com/arxaqapi/speech-maturity)
+
 Instead of initializing submodules after cloning the repository, we can also set a flag for the git clone command:
 
 ```bash
@@ -175,18 +177,36 @@ cd ..
 ```
 
 5. [Automatic Linguistic Unit Count Estimation](https://github.com/orasanen/ALICE)
-Note that ALICE has different requirements for Linux and macOS.
 
 ```bash
 git clone --recurse-submodules https://github.com/orasanen/ALICE.git
 cd ALICE
 conda env create -f ALICE_Linux.yml         # for Linux users
 conda env create -f ALICE_macOS.yml         # for macOS users
+cd ..
 ```
 
 ### Example Data Download
 
-Download VanDam data, or copy-paste data to repo folder data.
+As example data, we use one recording plus annotations from the publically available [VanDam corpus](https://gin.g-node.org/LAAC-LSCP/vandam-data/src/master). Execute this code in your terminal from LONGFORM_TOOLS directory:
+
+```bash
+cd LongformWorkshop26
+mkdir data
+cd data
+mkdir recordings
+mkdir annotations
+cd recordings
+curl -L -O "https://gin.g-node.org/LAAC-LSCP/vandam-data/src/master/recordings/converted/standard/BN32_010007.wav"
+cd ../annotations
+while read -r url; do curl -L -O "$url"; done < ../../code/annotation_links.txt
+ls
+cd ..
+```
+
+Note: If you would like to use your own data, please place it into the same folders to make the further pipelines work! The data directory is ignored by git, so your data will not be tracked by or transfered to Github.
+
+You may now proceed to [long-form data processing section](#long-form-data-processing).
 
 ### Windows WSL installation
 Many tools for long-form processing do not work for Windows systems. Therefore, we install the Windows Subsystem for Linux (WSL). Note that some of the following steps might require administrator rights. We are following the [official Windows tutorial for WSL installation](https://learn.microsoft.com/en-us/windows/wsl/install). 
@@ -214,12 +234,40 @@ wsl --version
 
 ## Long-form data processing
 
-- VanDam data preparation (02_run_data_preparation.py and config.yml)
-- VTC plus metrics: 03_run_vtc.sh
-- Speech Maturity plus metrics: 04_run_speech_maturity_classifier.sh 
-- Babbling Recognition plus metrics: 05_run_barbar.sh plus ...
-- Visualize results: 06_visualize_results.py 
+Let's get started with the actual data processing! If you are using the example data, you may skip the first section.
 
+### Data conversion
 
+Most of the tools expect the recordings to be in .wav format with 16kHz samplingrate, and annotations to be in comma separated value format (.csv). To convert your data into expected formats (including audio extraction from video material), we prepared a script for you. Make sure your data is located in data/recordings and data/annotations folder, then execute the following lines in your terminal from LongformWorkshop26 directory:
 
+```bash
+conda activate longforms                        # activate environment with required libraries
+python code/convert_data.py                     # call the conversion script (it finds your data automatically)
+```
 
+### Speaker diarization
+
+- VTC + bash script
+
+### Child speech analysis I: Speech maturity classification
+- script to slice and throw away non-CHI for speech maturity
+
+### Child speech analysis II: Babbling recognition
+- BaBar
+
+### Caregiver speech analysis: Word count estimation
+- ALICE
+
+## Further information
+Here you can find links to interesting material and references.
+
+### Useful links
+
+- ACLEW tutorials
+- minCHAT format checker
+- ACLEW gold standard testing tool
+- Elan documentation
+
+### References
+
+Corresponding papers to tools.
