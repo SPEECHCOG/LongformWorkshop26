@@ -222,7 +222,7 @@ cd data
 mkdir recordings
 mkdir annotations
 cd recordings
-curl -L -O "https://gin.g-node.org/LAAC-LSCP/vandam-data/src/master/recordings/converted/standard/BN32_010007.wav"
+curl -L -O "https://gin.g-node.org/LAAC-LSCP/vandam-data/raw/master/recordings/converted/standard/BN32_010007.wav"
 cd ../annotations
 while read -r url; do curl -L -O "$url"; done < ../../code/annotation_links.txt
 ls
@@ -249,13 +249,69 @@ python code/convert_data.py                     # call the conversion script (it
 ### Speaker diarization
 The Voice Type Classifier (VTC) determines who speaks when in an given audio file: It performs segmentation of the recording, classifying the segments where at least one speaker is active into the broad categories of female (FEM), male (MAL), key-child (KCH), and other children's (OCH) speech.
 
-1. input: the tool receives...
-2. output: the tool outputs...
-3. parameters: ...
-4. code: full terminal command plus bash script command
+1. Input: VTC receives raw audio files in .wav format as inputs. If the audio files are not in mono-channel, 16kHz sampling rate format, they can be converted with the help of VTC/scripts/convert.py script (see code section below).
+
+2. Output: The tool outputs an RTTM (rich transcription time marked) file with turn takes and time stamps for every audio file it processes (named according to the filename of the audio file), and one rttm.csv file that contains the speaker segments from all files. Find more information about rttm files in this [stack overflow entry](https://stackoverflow.com/questions/30975084/rttm-file-format).
+
+3. Parameters: The tool receives the following arguments (required arguments are indicated with "!")
+    - ! wavs: path to the directory containing the audio files
+    - ! output: path to the directory where outputs will be stored (must exist)
+    - device: on which computing device the tool runs, either cpu, mps, gpu or cuda, and it is by default set to gpu
+    - min_duration_on_s: deletes utterances shorter than this threshold during post-processing
+    - min_duration_off_s: fills gaps smaller than this threshold between utterances of the same speaker group during post-processing
+    - checkpoint: which model checkpoint to use, by default set to the most recent one
+    - batch_size: how many samples to process at a time, by default set to 128
+    - recursive_search: searches recursively for files in waves directory (needed if your data is located in nested subdirectories)
+    - high_precision: sets higher higher thresholds for speech detection during inference
+    - keep_raw: saves raw (==non-post-processed) outputs to disk
+
+4. Code: To run VTC with default settings on CPU, open your terminal from this repository's folder, and execute this code:
+
+```bash
+mkdir -p data/results
+mkdir -p data/results/VTC_outputs
+cd ../VTC
+uv run scripts/infer.py --wavs ../LongformWorkshop26/data/recordings --output ../LongformWorkshop26/data/results/VTC_outputs --device cpu
+# wait until the tool has finished, then navigate back
+cd ..
+```
+
+If you wanted to add more parameters, modify the command:
+
+```bash
+uv run scripts/infer.py --wavs ../LongformWorkshop26/data/recordings \
+--output ../LongformWorkshop26/data/results/VTC_outputs --device cpu \
+--min_duration_on_s 0.5 --high_precision
+```
+
+Alternatively, you can specify inputs and additional parameters in the bash script that VTC is providing in VTC/scripts/run.sh. For an example, see this repository's example/VTC_script_example.sh file. 
+
+```bash
+mkdir -p data/results
+mkdir -p data/results/VTC_outputs
+cd ../VTC
+bash scripts/run.sh
+cd ..
+```
+
+To run audio conversion on input files as a preparation step (f.ex., multi-channel to mono-channel), run
+
+```bash
+mkdir -p data/converted
+mkdir -p data/results
+mkdir -p data/results/VTC_outputs
+cd ../VTC
+uv run scripts/convert.py --wavs ../LongformWorkshop26/data/recordings --output ../LongformWorkshop26/data/converted --allow_upsampling
+# now we give converted data as an input:
+uv run scripts/infer.py --wavs ../LongformWorkshop26/data/converted --output ../LongformWorkshop26/data/results/VTC_outputs --device cpu
+cd ..
+```
 
 ### Child speech analysis I: Speech maturity classification
-- script to slice and throw away non-CHI for speech maturity
+[TODO: script to slice and throw away non-CHI for speech maturity!]
+
+The speech maturity model classifies infant vocalizations as 
+
 
 ### Child speech analysis II: Babbling recognition
 - BaBar
