@@ -1,10 +1,8 @@
 # Workshop on "Introduction to child-centered longform audio processing"
 
-(TODO:) Introduction. 
+This repository is a step-by-step tutorial to use long-form analysis tools in practice. If you run into trouble with any of the tools, you might lack some of the required installations. In that case, refer to technical setup files in this repository.
 
-If you run into trouble with any of the tools, you might lack some of the required installations. In that case, refer to technical setup files in this repository. 
-
-If you want to clone this repo, install the example data, or convert your own data, refer to these sections:
+Relevant sections for cloning this repo, install the example data, or convert your own data:
 
 - [repository cloning](#repository-installation)
 - [example data download](#example-data-download)
@@ -19,7 +17,9 @@ Overview to run the tools:
 
 If you use longform data analaysis tools for your research, please recognize the authors in the [references section](#references). You might want to check out our collection of [interesting links](#further-information).
 
+
 ## How to get started
+
 We recommend to store all tools in one directory called LONGFORM_TOOLS. Open a terminal, and create the folder with these commands:
 
 ```bash
@@ -29,6 +29,7 @@ ls                      # should yield an empty line
 ```
 
 ### Repository installation
+
 In general, you can clone any public repository from Github by navigating to its homepage, clicking the green button "Code", copying the HTTPS-key and running "git clone HTTPS-link" (replace "HTTPS-link" with the actual link). Let's get started by cloning [this repository](https://github.com/SPEECHCOG/LongformWorkshop26):
 
 ```bash
@@ -36,6 +37,7 @@ git clone https://github.com/SPEECHCOG/LongformWorkshop26.git
 ```
 
 ### Example Data Download
+
 TODO: add small script to slice 10min of data from VanDam
 
 As example data, we use one recording plus annotations from the publically available [VanDam corpus](https://gin.g-node.org/LAAC-LSCP/vandam-data/src/master). Execute this code in your terminal from LONGFORM_TOOLS directory:
@@ -57,6 +59,7 @@ cd ..
 Note: If you would like to use your own data, please place it into the same folders to make the further pipelines work! The data directory is ignored by git, so your data will not be tracked by or transfered to Github.
 
 ### Data conversion 
+
 TODO: include Daniil's data conversion script.
 
 Most of the tools expect the recordings in .wav format with 16kHz samplingrate, and reference annotations in comma separated value format (.csv). To convert your data into expected formats (including audio extraction from video material), we prepared a script for you. Make sure your data is located in data/recordings and data/annotations folder, then execute the following lines in your terminal from LongformWorkshop26 directory:
@@ -68,10 +71,13 @@ conda activate longforms                        # activate environment with requ
 python code/convert_data.py                     # call the conversion script (it finds your data automatically)
 ```
 
+
 ## Long-form data processing
+
 Let's get started with the actual data processing! Every section follows the structure: 1. input: what does the tool receive? 2. output: what does the tool return? 3. parameters: what parameters can be set to modify the tool outputs? 4. code: how to run the tool.
 
 ### Speaker diarization
+
 The [Voice Type Classifier](https://github.com/LAAC-LSCP/VTC/tree/main) (VTC) determines who speaks when in an given audio file: It performs segmentation of the recording, classifying the segments where at least one speaker is active into the broad categories of female (FEM), male (MAL), key-child (KCH), and other children's (OCH) speech. Install the repository first:
 
 ```bash
@@ -109,9 +115,10 @@ uv run scripts/infer.py --wavs ../LongformWorkshop26/data/recordings --output ..
 cd ..
 ```
 
-Alternatively, you can specify inputs and additional parameters in the bash script that VTC is providing in VTC/scripts/run.sh. For an example, see this repository's example/VTC_script_example.sh file. 
+    Alternatively, you can specify inputs and additional parameters in the bash script that VTC is providing in VTC/scripts/run.sh. For an example, see this repository's example/VTC_script_example.sh file. 
 
 ### Child speech analysis I: Speech maturity classification
+
 The [Speech Maturity Model](https://github.com/arxaqapi/speech-maturity) classifies infant vocalizations as non-canonical (NON-CAN) or canoncical (CAN) babbling, laughing (LAU), crying (CRY), with an additional class for everything else (JUNK).
 
 ```bash
@@ -143,6 +150,7 @@ cd ..
 ```
 
 ### Child speech analysis II: Babbling recognition
+
 [BabAR](https://github.com/MarvinLvn/BabAR) has VTC already included as the first step in its pipeline. Therefore, it has the same requirements as VTC.
 
 ```bash
@@ -179,6 +187,7 @@ uv run src/pipeline.py --wavs ../LongformWorkshop26/data/recordings --output ../
 ```
 
 ### Caregiver speech analysis: Word count estimation
+
 The [Automatic Linguistic Unit Count Estimater](https://github.com/orasanen/ALICE) (ALICE) uses VTC and [SylNet](https://github.com/shreyas253/SylNet) in its pipeline. The tool estimates the number of linguistic units in utterances from adult speakers only (FEM and MAL classes by VTC). Note that it relies on an older version of VTC.
 
 ```bash
@@ -195,7 +204,7 @@ conda env create -f ALICE_macOS.yml         # for macOS users
     - first positional argument: path to the recordings, or to a .txt file with a list of .wav paths (one path per row)
     - second positional argument: "gpu", if the dara should be processed on gpu
 
-Note that we cannot specify the output folder path, so results will be stored inside ALICE folder.
+    Note that we cannot specify the output folder path, so results will be stored inside ALICE folder.
 
 4. Code: We need to active ALICE environment with required software packages before running the tool:
 
@@ -205,21 +214,84 @@ conda activate ALICE
 conda deactivate 
 ```
 
+
 ## Further information
+
 Here you can find links to interesting material and references.
 
 ### Useful links
 
-- ACLEW tutorials
-- minCHAT format checker
-- ACLEW gold standard testing tool
-- Elan documentation
+- [PHRP training](https://phrptraining.com)
+- [ACLEW tutorials](https://osf.io/b2jep/overview)
+- minCHAT format checker [upload procedure](https://github.com/aclew/AAS-minCHAT-Checker/blob/master/README.md) 
+- [minCHAT checker](https://aclew.shinyapps.io/AAS-minCHAT-Checker/) 
+- gold standard [test submission](https://aclew.shinyapps.io/GSCompareApp/) 
+- Elan software [download](https://archive.mpi.nl/tla/elan/download) and [documentation](https://www.mpi.nl/tools/elan/docs/manual/index.html)
 
 ### References
 
-Corresponding papers to tools: 
-- VTC
-- BabyHuBERT
-- ALICE
-- Speech Maturity
-- BabAR
+```bibtex
+@misc{charlot_babyhubert_2025,
+	title = {{BabyHuBERT}: {Multilingual} {Self}-{Supervised} {Learning} for {Segmenting} {Speakers} in {Child}-{Centered} {Long}-{Form} {Recordings}},
+	shorttitle = {{BabyHuBERT}},
+	url = {http://arxiv.org/abs/2509.15001},
+	doi = {10.48550/arXiv.2509.15001},
+	urldate = {2025-10-04},
+	publisher = {arXiv},
+	author = {Charlot, Théo and Kunze, Tarek and Poli, Maxime and Cristia, Alejandrina and Dupoux, Emmanuel and Lavechin, Marvin},
+	month = sep,
+	year = {2025},
+}
+
+@inproceedings{lavechin_open-source_2020,
+	title = {An {Open}-{Source} {Voice} {Type} {Classifier} for {Child}-{Centered} {Daylong} {Recordings}},
+	url = {https://www.isca-archive.org/interspeech_2020/lavechin20_interspeech.html},
+	doi = {10.21437/Interspeech.2020-1690},
+	urldate = {2025-10-24},
+	booktitle = {Interspeech 2020},
+	publisher = {ISCA},
+	author = {Lavechin, Marvin and Bousbib, Ruben and Bredin, Hervé and Dupoux, Emmanuel and Cristia, Alejandrina},
+	month = oct,
+	year = {2020},
+	pages = {3072--3076},
+}
+
+@misc{lavechin_babar_2026,
+	title = {{BabAR}: from phoneme recognition to developmental measures of young children's speech production},
+	shorttitle = {{BabAR}},
+	url = {http://arxiv.org/abs/2603.05213},
+	doi = {10.48550/arXiv.2603.05213},
+	urldate = {2026-09-06},
+	publisher = {arXiv},
+	author = {Lavechin, Marvin and Bergelson, Elika and Levy, Roger},
+	month = jun,
+	year = {2026},
+}
+
+@article{rasanen_alice_2021,
+	title = {{ALICE}: {An} open-source tool for automatic measurement of phoneme, syllable, and word counts from child-centered daylong recordings},
+	volume = {53},
+	url = {https://link.springer.com/10.3758/s13428-020-01460-x},
+	doi = {10.3758/s13428-020-01460-x},
+	number = {2},
+	urldate = {2025-11-06},
+	journal = {Behavior Research Methods},
+	author = {Räsänen, Okko and Seshadri, Shreyas and Lavechin, Marvin and Cristia, Alejandrina and Casillas, Marisa},
+	month = apr,
+	year = {2021},
+	pages = {818--835},
+}
+
+@inproceedings{zhang_employing_2025,
+	title = {Employing self-supervised learning models for cross-linguistic child speech maturity classification},
+	url = {https://www.isca-archive.org/interspeech_2025/zhang25r_interspeech.html},
+	doi = {10.21437/Interspeech.2025-1946},
+	urldate = {2026-08-08},
+	booktitle = {Interspeech 2025},
+	publisher = {ISCA},
+	author = {Zhang, Theo and Suresh, Madurya and Warluamont, Anne and Hitczenko, Kasia and Cristia, Alejandrina and Cychosz, Margaret},
+	month = aug,
+	year = {2025},
+	pages = {2825--2829},
+}
+```
