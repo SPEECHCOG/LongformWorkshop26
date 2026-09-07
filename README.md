@@ -53,9 +53,10 @@ Note: If you would like to use your own data, please place it into the same fold
 Most of the tools expect the recordings in .wav format with 16kHz samplingrate. To convert your data into expected formats, we prepared different scripts depending on the input type for you. Make sure your data is located in data/recordings folder, then execute the following lines in your terminal from LongformWorkshop26 directory:
 
 ```bash
-bash code/mp4_converter.sh                  # for video to audio (.wav) conversion 
-bash code/mp3_converter.sh					# for .mp3 to .wav conversion
-bash code/wav_converter.sh					# for .wav resampling to 16kHz mono-channel
+cd data/recordings						
+bash ../../code/mp4_converter.sh                # for video to audio (.wav) conversion 
+bash ./../code/mp3_converter.sh					# for .mp3 to .wav conversion
+bash ./../code/wav_converter.sh					# for .wav resampling to 16kHz mono-channel
 ```
 
 The scripts create a subdirectory "wav", that you need to add to the input paths in the following.
@@ -69,6 +70,7 @@ Let's get started with the actual data processing! Every section follows the str
 The [Voice Type Classifier](https://github.com/LAAC-LSCP/VTC/tree/main) (VTC) determines who speaks when in an given audio file: It performs segmentation of the recording, classifying the segments where at least one speaker is active into the broad categories of female (FEM), male (MAL), key-child (KCH), and other children's (OCH) speech. Install the repository first:
 
 ```bash
+# navigate to LONGFORM_TOOLS directory
 git clone --recurse-submodules https://github.com/LAAC-LSCP/VTC.git
 cd VTC
 sh check_sys_dependencies.sh
@@ -107,10 +109,12 @@ cd ..
 	If you are familiar with Praat or Elan, you can use the rttm_to_eaf_textgrid converter to inspect the results. Note that you need to have conda installed to run the code, and that the argument audio-path is not required, so you may delete it.
 
 ```bash
+cd LongformWorkshop26
 conda env create -f code/environment.yml	# if you lack conda, refer to technical_setup_mac_linux!
 conda activate longforms                    
 python code/rttm_to_eaf_textgrid.py data/results/VTC_outputs/rttm.csv --audio-path data/recordings --output-path annotations/VTC_annotations
-conda deactivate							
+conda deactivate
+cd ..						
 ```
 
 ### Child speech analysis I: Speech maturity classification
@@ -130,11 +134,11 @@ uv sync
     - ! predictions: path to the output folder
     - ! device: device to run the model on: cpu, mps (macOS only), gpu or cuda
     
-    In addition, we need to set a few parameters in the file "hparams/hparams.yaml":
+    In addition, we need to set a few parameters in the file "hparams/hparams.yaml", in section test_dataloader_options:
 
-    - ! batch_size in test_dataloader_options: how many samples to run inference on at once; set to 1 if you use the example data, or a reasonable small size such that: amount of data % batch_size == as small as possible
-    - ! num_workers: paralellization mode during data loading; set all 3 instances of "num_workers" to 0
-    - ! drop_last: whether to drop the last data samples resulting from data % batchsize; set all 3 instaces to "True"
+    - ! batch_size: how many samples to run inference on at once; set to 2 if you use the example data, or a reasonable small size such that: amount of data % batch_size == as small as possible
+    - ! num_workers: paralellization mode during data loading; set to 0
+    - ! drop_last: whether to drop the last data samples resulting from data % batchsize; set to "True"
 
 4. Code: Run this code from speech-maturity directory:
 
