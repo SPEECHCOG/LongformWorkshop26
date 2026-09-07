@@ -8,12 +8,13 @@ Relevant sections for cloning this repo, install the example data, or convert yo
 - [example data download](#example-data-download)
 - [data conversion](#data-conversion)
 
-Overview to run the tools:
+Overview on how to run the tools:
 
 - [Voice Type Classifier (VTC)](#speaker-diarization)
 - [Speech Maturity Classifier](#child-speech-analysis-i-speech-maturity-classification)
 - [Babbling Recognizer (BaBAR)](#child-speech-analysis-ii-babbling-recognition)
 - [Linguistic Unit Count Estimation (ALICE)](#caregiver-speech-analysis-word-count-estimation)
+- [Textgrid and Elan output converter]()
 
 If you use longform data analaysis tools for your research, please recognize the authors in the [references section](#references). You might want to check out our collection of [interesting links](#further-information).
 
@@ -38,39 +39,26 @@ git clone https://github.com/SPEECHCOG/LongformWorkshop26.git
 
 ### Example Data Download
 
-TODO: add small script to slice 10min of data from VanDam
-
-As example data, we use one recording plus annotations from the publically available [VanDam corpus](https://gin.g-node.org/LAAC-LSCP/vandam-data/src/master). Execute this code in your terminal from LONGFORM_TOOLS directory:
+As example data, we use one recording from the publically available [VanDam corpus](https://gin.g-node.org/LAAC-LSCP/vandam-data/src/master). Execute this code in your terminal from LONGFORM_TOOLS directory. Note that this requires FFmpeg since we chunk the downloaded audio file. For installations, refer to the technical_setup files.
 
 ```bash
-cd LongformWorkshop26                       
-mkdir data
-cd data
-mkdir recordings
-mkdir annotations
-cd recordings
-curl -L -O "https://gin.g-node.org/LAAC-LSCP/vandam-data/raw/master/recordings/converted/standard/BN32_010007.wav"
-cd ../annotations
-while read -r url; do curl -L -O "$url"; done < ../../code/annotation_links.txt
-ls
-cd ..
+cd LongformWorkshop26
+bash code/data_download.sh
 ```
 
 Note: If you would like to use your own data, please place it into the same folders to make the further pipelines work! The data directory is ignored by git, so your data will not be tracked by or transfered to Github.
 
 ### Data conversion 
 
-TODO: include Daniil's data conversion script.
-
-Most of the tools expect the recordings in .wav format with 16kHz samplingrate, and reference annotations in comma separated value format (.csv). To convert your data into expected formats (including audio extraction from video material), we prepared a script for you. Make sure your data is located in data/recordings and data/annotations folder, then execute the following lines in your terminal from LongformWorkshop26 directory:
+Most of the tools expect the recordings in .wav format with 16kHz samplingrate. To convert your data into expected formats, we prepared different scripts depending on the input type for you. Make sure your data is located in data/recordings folder, then execute the following lines in your terminal from LongformWorkshop26 directory:
 
 ```bash
-conda env create -f code/environment.yml        # installs the conda environment in folder code
-cd ..                                           # navigates back to LONGFORM_TOOLS directory
-conda activate longforms                        # activate environment with required libraries
-python code/convert_data.py                     # call the conversion script (it finds your data automatically)
+bash code/mp4_converter.sh                  # for video to audio (.wav) conversion 
+bash code/mp3_converter.sh					# for .mp3 to .wav conversion
+bash code/wav_converter.sh					# for .wav resampling to 16kHz mono-channel
 ```
 
+The scripts create a subdirectory "wav", that you need to add to the input paths in the following.
 
 ## Long-form data processing
 
@@ -108,7 +96,6 @@ If one of the above commands fails, refer to technical_setup file and follow the
 4. Code: To run VTC with default settings on CPU, run this code from VTC directory::
 
 ```bash
-mkdir -p ../LongformWorkshop26/data/results
 mkdir -p ../LongformWorkshop26/data/results/VTC_outputs
 uv run scripts/infer.py --wavs ../LongformWorkshop26/data/recordings --output ../LongformWorkshop26/data/results/VTC_outputs --device cpu
 # wait until the tool has finished, then navigate back
@@ -116,6 +103,15 @@ cd ..
 ```
 
     Alternatively, you can specify inputs and additional parameters in the bash script that VTC is providing in VTC/scripts/run.sh. For an example, see this repository's example/VTC_script_example.sh file. 
+
+	If you are familiar with Praat or Elan, you can use the rttm_to_eaf_textgrid converter to inspect the results. Note that you need to have conda installed to run the code, and that the argument audio-path is not required, so you may delete it.
+
+```bash
+conda env create -f code/environment.yml	# if you lack conda, refer to technical_setup_mac_linux!
+conda activate longforms                    
+python code/rttm_to_eaf_textgrid.py data/results/VTC_outputs/rttm.csv --audio-path data/recordings --output-path annotations/VTC_annotations
+conda deactivate							
+```
 
 ### Child speech analysis I: Speech maturity classification
 
@@ -143,7 +139,6 @@ uv sync
 4. Code: Run this code from speech-maturity directory:
 
 ```bash
-mkdir -p ../LongformWorkshop26/data/results
 mkdir -p ../LongformWorkshop26/data/results/Speech_Maturity_outputs
 uv run scripts/infer.py --wavs ../LongformWorkshop26/data/recordings --output ../LongformWorkshop26/data/results/Speech_Maturity_outputs --device cpu
 cd ..
@@ -181,7 +176,6 @@ uv sync
 4. Code: 
 
 ```bash
-mkdir -p ../LongformWorkshop26/data/results
 mkdir -p ../LongformWorkshop26/data/results/BabAR_outputs
 uv run src/pipeline.py --wavs ../LongformWorkshop26/data/recordings --output ../LongformWorkshop26/data/results/BabAR_outputs --device cpu
 ```
@@ -213,7 +207,6 @@ conda activate ALICE
 ./run_ALICE.sh ../LongformWorkshop26/data/recordings
 conda deactivate 
 ```
-
 
 ## Further information
 
