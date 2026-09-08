@@ -8,7 +8,7 @@ Here you can find steps to install:
 - [Miniconda](#miniconda-installation) needed for ALICE
 - [Sox](#sound-exchange-sox-installation) needed for ALICE
 - [git-lfs](#git-lfs-installation) needed for VTC, BAbar, Speech Maturity Classifier
-- [FFmepg](#ffmpeg-installation) needed for VTC, BAbar, Speech Maturity Classifier
+- [FFmpeg](#ffmpeg-installation) needed for VTC, BAbar, Speech Maturity Classifier
 - [uv](#uv-installation) needed for VTC, BAbar, Speech Maturity Classifier
 
 
@@ -70,6 +70,14 @@ which ffmpeg
 ffmpeg -version
 ```
 
+For those who are able to use homebrew:
+
+```bash
+brew install ffmpeg
+export DYLD_LIBRARY_PATH="/opt/homebrew/opt/ffmpeg@8/lib:$DYLD_LIBRARY_PATH"
+python -c "import ctypes; ctypes.CDLL('/opt/homebrew/opt/ffmpeg@8/lib/libavcodec.dylib'); print('ok')"
+```
+
 ### FFmpeg for linux / wsl
 
 ```bash
@@ -84,5 +92,10 @@ Last but not least, we install the Python package manager uv:
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Close and re-open the terminal, then verify the installation:
+
+```bash
 uv --version
 ```

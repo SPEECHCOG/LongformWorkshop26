@@ -1,6 +1,6 @@
 # Workshop on "Introduction to child-centered longform audio processing"
 
-This repository is a step-by-step tutorial to use long-form analysis tools in practice. If you run into trouble with any of the tools, you might lack some of the required installations. In that case, refer to technical setup files in this repository.
+This repository is a step-by-step tutorial to use long-form analysis tools in practice. If you run into trouble with any of the tools, you might lack some of the required installations. In that case, refer to technical setup files in this repository. Note: If you lack sudo / admin rights on your computer, some of the installations might not work.
 
 Relevant sections for cloning this repo, install the example data, or convert your own data:
 
@@ -24,7 +24,8 @@ If you use longform data analaysis tools for your research, please recognize the
 We recommend to store all tools in one directory called LONGFORM_TOOLS. Open a terminal, and create the folder with these commands:
 
 ```bash
-mkdir LONGFORM_TOOLS    # creates a new folder called "LONGFORM_TOOLS"
+cd ~					# navigate to home directory
+mkdir LONGFORM_TOOLS    # create a new folder called "LONGFORM_TOOLS"
 cd LONGFORM_TOOLS       # now we are in empty folder "LONGFORM_TOOLS"
 ls                      # should yield an empty line
 ```
@@ -34,6 +35,7 @@ ls                      # should yield an empty line
 In general, you can clone any public repository from Github by navigating to its homepage, clicking the green button "Code", copying the HTTPS-key and running "git clone HTTPS-link" (replace "HTTPS-link" with the actual link). Let's get started by cloning [this repository](https://github.com/SPEECHCOG/LongformWorkshop26):
 
 ```bash
+cd ~/LONGFORM_TOOLS		# navigate to directory LONGFORM_TOOLS to place the repository there
 git clone https://github.com/SPEECHCOG/LongformWorkshop26.git
 ```
 
@@ -42,24 +44,26 @@ git clone https://github.com/SPEECHCOG/LongformWorkshop26.git
 As example data, we use one recording from the publically available [VanDam corpus](https://gin.g-node.org/LAAC-LSCP/vandam-data/src/master). Execute this code in your terminal from LONGFORM_TOOLS directory. Note that this requires FFmpeg since we chunk the downloaded audio file. For installations, refer to the technical_setup files.
 
 ```bash
-cd LongformWorkshop26
+cd LongformWorkshop26	# if you cannot find the directory, try: cd ~/LONGFORM_TOOLS/LongformWorkshop26
 bash code/data_download.sh
 ```
 
-Note: If you would like to use your own data, please place it into the same folders to make the further pipelines work! The data directory is ignored by git, so your data will not be tracked by or transfered to Github.
+Note: If you would like to use your own data, please place it into LongformWorkshop26/data/recordings and run [data conversion](#data-conversion) to make the further pipelines work! The data directory is ignored by git, so your data will not be tracked by or transfered to Github.
 
 ### Data conversion 
 
-Most of the tools expect the recordings in .wav format with 16kHz samplingrate. To convert your data into expected formats, we prepared different scripts depending on the input type for you. Make sure your data is located in data/recordings folder, then execute the following lines in your terminal from LongformWorkshop26 directory:
+Note: If you are using the example data, you may skip this part! 
+
+Most of the tools expect the recordings in .wav format with 16kHz sampling rate. To convert your own data into expected formats, we prepared different scripts depending on the input type for you. Make sure your data is located in data/recordings folder, then execute the following lines in your terminal from LongformWorkshop26 directory:
 
 ```bash
-cd data/recordings						
-bash ../../code/mp4_converter.sh                # for video to audio (.wav) conversion 
-bash ./../code/mp3_converter.sh					# for .mp3 to .wav conversion
-bash ./../code/wav_converter.sh					# for .wav resampling to 16kHz mono-channel
+cd ~/LONGFORM_TOOLS/LongformWorkshop26/data/recordings
+bash ../../code/mp4_converter.sh                		# for video to audio (.wav) conversion 
+bash ../../code/mp3_converter.sh						# for .mp3 to .wav conversion
+bash ../../code/wav_converter.sh						# for .wav resampling to 16kHz mono-channel
 ```
 
-The scripts create a subdirectory "wav", that you need to add to the input paths in the following.
+The scripts create a subdirectory "wav" where it places the converted files.
 
 ## Long-form data processing
 
@@ -67,17 +71,19 @@ Let's get started with the actual data processing! Every section follows the str
 
 ### Speaker diarization
 
-The [Voice Type Classifier](https://github.com/LAAC-LSCP/VTC/tree/main) (VTC) determines who speaks when in an given audio file: It performs segmentation of the recording, classifying the segments where at least one speaker is active into the broad categories of female (FEM), male (MAL), key-child (KCH), and other children's (OCH) speech. Install the repository first:
+The [Voice Type Classifier](https://github.com/LAAC-LSCP/VTC/tree/main) (VTC) determines who speaks when in an given audio file: It performs segmentation of the recording, classifying the segments where at least one speaker is active into the broad categories of female (FEM), male (MAL), key-child (KCH), and other children's (OCH) speech. Create an output directory first, then install the repository:
 
 ```bash
-# navigate to LONGFORM_TOOLS directory
+cd ~/LONGFORM_TOOLS										# navigate to LONGFORM_TOOLS to place the repository there
+mkdir -p LongformWorkshop26/data/results/VTC_outputs	# create directory for outputs
+git lfs install											
 git clone --recurse-submodules https://github.com/LAAC-LSCP/VTC.git
-cd VTC
-sh check_sys_dependencies.sh
-uv sync
+cd VTC													# navigate to VTC folder
+sh check_sys_dependencies.sh							# verify system requirements
+uv sync													
 ```
 
-If one of the above commands fails, refer to technical_setup file and follow the installation steps required for VTC.
+If one of the above commands fails, refer to technical_setup_mac_linux file and follow the installation steps required for VTC.
 
 1. Input: VTC receives raw audio files in .wav format as inputs. 
 
@@ -98,23 +104,20 @@ If one of the above commands fails, refer to technical_setup file and follow the
 4. Code: To run VTC with default settings on CPU, run this code from VTC directory::
 
 ```bash
-mkdir -p ../LongformWorkshop26/data/results/VTC_outputs
-uv run scripts/infer.py --wavs ../LongformWorkshop26/data/recordings --output ../LongformWorkshop26/data/results/VTC_outputs --device cpu
-# wait until the tool has finished, then navigate back
-cd ..
+cd ~/LONGFORM_TOOLS/VTC						# in case you are not in VTC directory, navigate there
+uv run scripts/infer.py --wavs ../LongformWorkshop26/data/recordings/wav --output ../LongformWorkshop26/data/results/VTC_outputs --device cpu
 ```
 
-    Alternatively, you can specify inputs and additional parameters in the bash script that VTC is providing in VTC/scripts/run.sh. For an example, see this repository's example/VTC_script_example.sh file. 
+Alternatively, you can specify inputs and additional parameters in the bash script that VTC is providing in VTC/scripts/run.sh. For an example, see this repository's examples/VTC_script_example.sh file. 
 
-	If you are familiar with Praat or Elan, you can use the rttm_to_eaf_textgrid converter to inspect the results. Note that you need to have conda installed to run the code, and that the argument audio-path is not required, so you may delete it.
+If you are familiar with Praat or Elan, you can use the rttm_to_eaf_textgrid converter to inspect the results. Note that you need to have conda installed to run the code, and that the argument audio-path is not required, so you may delete it.
 
 ```bash
-cd LongformWorkshop26
+cd ~/LONGFORM_TOOLS/LongformWorkshop26
 conda env create -f code/environment.yml	# if you lack conda, refer to technical_setup_mac_linux!
 conda activate longforms                    
-python code/rttm_to_eaf_textgrid.py data/results/VTC_outputs/rttm.csv --audio-path data/recordings --output-path annotations/VTC_annotations
+python code/rttm_to_eaf_textgrid.py data/results/VTC_outputs/rttm.csv --audio-path data/recordings/wav --output-path data/annotations/VTC_annotations
 conda deactivate
-cd ..						
 ```
 
 ### Child speech analysis I: Speech maturity classification
@@ -122,6 +125,8 @@ cd ..
 The [Speech Maturity Model](https://github.com/arxaqapi/speech-maturity) classifies infant vocalizations as non-canonical (NON-CAN) or canoncical (CAN) babbling, laughing (LAU), crying (CRY), with an additional class for everything else (JUNK).
 
 ```bash
+cd ~/LONGFORM_TOOLS
+mkdir -p LongformWorkshop26/data/results/Speech_Maturity_outputs
 git clone --recurse-submodules https://github.com/arxaqapi/speech-maturity.git
 cd speech-maturity
 uv sync
@@ -130,22 +135,30 @@ uv sync
 1. Input: The tool receives audio clips that contain child vocalizations, f.ex., extracted via VTC.
 2. Output: The tool returns a .csv file with the columns id, predicted_label (integer from 0 to 4), and corresponding prediction_class_name.
 3. Parameters: 
-    - ! wavs: path to the folder containing the audio files
-    - ! predictions: path to the output folder
-    - ! device: device to run the model on: cpu, mps (macOS only), gpu or cuda
+	The following paths need to be set inside the file run.sh that you can find in speech-maturity directory:
+
+    - ! audios_path: path to VTC segments, set to ~/LONGFORM_TOOLS/LongformWorkshop26/data/recordings/VTC_segments/KCHI 
+    - ! output_folder: where to store the results, set to ../LongformWorkshop26/data/results/Speech_Maturity_outputs
     
     In addition, we need to set a few parameters in the file "hparams/hparams.yaml", in section test_dataloader_options:
 
-    - ! batch_size: how many samples to run inference on at once; set to 2 if you use the example data, or a reasonable small size such that: amount of data % batch_size == as small as possible
+    - ! batch_size: how many samples to run inference on at once; set to 4 if you use the example data, or to a reasonable small size such that: amount of data % batch_size == as small as possible
     - ! num_workers: paralellization mode during data loading; set to 0
     - ! drop_last: whether to drop the last data samples resulting from data % batchsize; set to "True"
 
-4. Code: Run this code from speech-maturity directory:
+4. Code: Before we can run the tool, we need to chunk the long-form audio into utterances based on the VTC outputs. We prepared a small script for that, which requires the conda environment from technical_setup_mac_linux file:
 
 ```bash
-mkdir -p ../LongformWorkshop26/data/results/Speech_Maturity_outputs
-uv run scripts/infer.py --wavs ../LongformWorkshop26/data/recordings --output ../LongformWorkshop26/data/results/Speech_Maturity_outputs --device cpu
-cd ..
+cd ~/LONGFORM_TOOLS/LongformWorkshop26					
+conda activate longforms					# if this command fails, refer to technical_setup and install conda environment
+python code/extract_segments.py	--kchi		# extracts KCHI vocalizations only
+```
+
+Now we navigate back to speech-maturity directory and execute the script that runs the tool:
+
+```bash
+cd ~/LONGFORM_TOOLS/speech-maturity			# in case you are not in speech-maturity directory, navigate there
+bash run.sh
 ```
 
 ### Child speech analysis II: Babbling recognition
@@ -153,6 +166,8 @@ cd ..
 [BabAR](https://github.com/MarvinLvn/BabAR) has VTC already included as the first step in its pipeline. Therefore, it has the same requirements as VTC.
 
 ```bash
+cd ~/LONGFORM_TOOLS											
+mkdir -p LongformWorkshop26/data/results/BabAR_outputs		# create output folder 
 git clone --recurse-submodules https://github.com/MarvinLvn/BabAR.git
 cd BabAR
 uv sync
@@ -180,15 +195,16 @@ uv sync
 4. Code: 
 
 ```bash
-mkdir -p ../LongformWorkshop26/data/results/BabAR_outputs
-uv run src/pipeline.py --wavs ../LongformWorkshop26/data/recordings --output ../LongformWorkshop26/data/results/BabAR_outputs --device cpu
+cd ~/LONGFORM_TOOLS/BabAR					# in case you are not in BabAR directory, navigate there
+uv run src/pipeline.py --wavs ../LongformWorkshop26/data/recordings/wav --output ../LongformWorkshop26/data/results/BabAR_outputs --device cpu
 ```
 
 ### Caregiver speech analysis: Word count estimation
 
-The [Automatic Linguistic Unit Count Estimater](https://github.com/orasanen/ALICE) (ALICE) uses VTC and [SylNet](https://github.com/shreyas253/SylNet) in its pipeline. The tool estimates the number of linguistic units in utterances from adult speakers only (FEM and MAL classes by VTC). Note that it relies on an older version of VTC.
+The [Automatic Linguistic Unit Count Estimater](https://github.com/orasanen/ALICE) (ALICE) uses VTC and [SylNet](https://github.com/shreyas253/SylNet) in its pipeline. The tool estimates the number of linguistic units in utterances from adult speakers only (FEM and MAL classes by VTC). Note that it relies on an older version of VTC and python, and that Apple Silicon and Windows devices are not supported.
 
 ```bash
+cd ~/LONGFORM_TOOLS
 git clone --recurse-submodules https://github.com/orasanen/ALICE.git
 cd ALICE
 conda env create -f ALICE_Linux.yml         # for Linux users
@@ -207,8 +223,9 @@ conda env create -f ALICE_macOS.yml         # for macOS users
 4. Code: We need to active ALICE environment with required software packages before running the tool:
 
 ```bash
+cd ~/LONGFORM_TOOLS/ALICE					# in case you are not in ALICE directory, navigate there
 conda activate ALICE                       
-./run_ALICE.sh ../LongformWorkshop26/data/recordings
+./run_ALICE.sh ../LongformWorkshop26/data/recordings/wav/
 conda deactivate 
 ```
 
@@ -278,6 +295,32 @@ Here you can find links to interesting material and references.
 	year = {2021},
 	pages = {818--835},
 }
+
+@misc{vandam_corpus,
+	title = {VanDam Public Daylong HomeBank Corpus},
+	url = {https://gin.g-node.org/LAAC-LSCP/vandam-data/src/master},
+	doi = {doi:10.21415/T5388S},
+	author = {VanDam, Mark},
+	year = {2018}
+}
+
+
+@article{vandam_homebank_2016,
+	title = {{HomeBank}: {An} {Online} {Repository} of {Daylong} {Child}-{Centered} {Audio} {Recordings}},
+	volume = {37},
+	issn = {0734-0478, 1098-9056},
+	shorttitle = {{HomeBank}},
+	url = {http://www.thieme-connect.de/DOI/DOI?10.1055/s-0036-1580745},
+	doi = {10.1055/s-0036-1580745},
+	number = {02},
+	urldate = {2025-10-15},
+	journal = {Seminars in Speech and Language},
+	author = {VanDam, Mark and Warlaumont, Anne and Bergelson, Elika and Cristia, Alejandrina and Soderstrom, Melanie and De Palma, Paul and MacWhinney, Brian},
+	month = apr,
+	year = {2016},
+	pages = {128--142},
+}
+
 
 @inproceedings{zhang_employing_2025,
 	title = {Employing self-supervised learning models for cross-linguistic child speech maturity classification},
