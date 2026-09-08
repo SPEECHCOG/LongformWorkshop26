@@ -1,6 +1,8 @@
 # Workshop on "Introduction to child-centered longform audio processing"
 
-This repository is a step-by-step tutorial to use long-form analysis tools in practice. If you run into trouble with any of the tools, you might lack some of the required installations. In that case, refer to technical setup files in this repository. Note: If you lack sudo / admin rights on your computer, some of the installations might not work.
+This repository is a step-by-step tutorial to use long-form analysis tools in practice. If you run into trouble with any of the tools, you might lack some of the required installations. In that case, refer to technical setup files in this repository.
+
+Note: If you lack sudo / admin rights on your computer, some of the installations might not work.
 
 Relevant sections for cloning this repo, install the example data, or convert your own data:
 
@@ -26,7 +28,7 @@ We recommend to store all tools in one directory called LONGFORM_TOOLS. Open a t
 ```bash
 cd ~					# navigate to home directory
 mkdir LONGFORM_TOOLS    # create a new folder called "LONGFORM_TOOLS"
-cd LONGFORM_TOOLS       # now we are in empty folder "LONGFORM_TOOLS"
+cd LONGFORM_TOOLS       # navigate to empty folder "LONGFORM_TOOLS"
 ls                      # should yield an empty line
 ```
 
@@ -63,7 +65,7 @@ bash ../../code/mp3_converter.sh						# for .mp3 to .wav conversion
 bash ../../code/wav_converter.sh						# for .wav resampling to 16kHz mono-channel
 ```
 
-The scripts create a subdirectory "wav" where it places the converted files.
+The scripts create a subdirectory "wav" where they place the converted files.
 
 ## Long-form data processing
 
@@ -296,7 +298,7 @@ Here you can find links to interesting material and references.
 	pages = {818--835},
 }
 
-@misc{vandam_corpus,
+@misc{vandam_corpus_2018,
 	title = {VanDam Public Daylong HomeBank Corpus},
 	url = {https://gin.g-node.org/LAAC-LSCP/vandam-data/src/master},
 	doi = {doi:10.21415/T5388S},
