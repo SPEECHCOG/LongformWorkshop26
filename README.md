@@ -2,9 +2,9 @@
 
 This repository is a step-by-step tutorial to use long-form analysis tools in practice. If you run into trouble with any of the tools, you might lack some of the required installations. In that case, refer to technical setup files in this repository.
 
-Note: If you lack sudo / admin rights on your computer, some of the installations might not work.
+Note: If you lack sudo / admin rights on your computer, some of the installations might not work. 
 
-Relevant sections for cloning this repo, install the example data, or convert your own data:
+Relevant sections for cloning this repo, installing the example data, or converting your own data:
 
 - [repository cloning](#repository-installation)
 - [example data download](#example-data-download)
@@ -16,14 +16,13 @@ Overview on how to run the tools:
 - [Speech Maturity Classifier](#child-speech-analysis-i-speech-maturity-classification)
 - [Babbling Recognizer (BaBAR)](#child-speech-analysis-ii-babbling-recognition)
 - [Linguistic Unit Count Estimation (ALICE)](#caregiver-speech-analysis-word-count-estimation)
-- [Textgrid and Elan output converter]()
 
 If you use longform data analaysis tools for your research, please recognize the authors in the [references section](#references). You might want to check out our collection of [interesting links](#further-information).
 
 
 ## How to get started
 
-We recommend to store all tools in one directory called LONGFORM_TOOLS. Open a terminal, and create the folder with these commands:
+We recommend to store all tools in one directory called LONGFORM_TOOLS located in home directory. In case you use your own folder structure, please avoid directory names that contain space characters (replace f.ex. with underscores). Open a terminal, and create the folder with these commands:
 
 ```bash
 cd ~					# navigate to home directory
@@ -203,14 +202,20 @@ uv run src/pipeline.py --wavs ../LongformWorkshop26/data/recordings/wav --output
 
 ### Caregiver speech analysis: Word count estimation
 
-The [Automatic Linguistic Unit Count Estimater](https://github.com/orasanen/ALICE) (ALICE) uses VTC and [SylNet](https://github.com/shreyas253/SylNet) in its pipeline. The tool estimates the number of linguistic units in utterances from adult speakers only (FEM and MAL classes by VTC). Note that it relies on an older version of VTC and python, and that Apple Silicon and Windows devices are not supported.
+The [Automatic Linguistic Unit Count Estimater](https://github.com/orasanen/ALICE) (ALICE) uses VTC and [SylNet](https://github.com/shreyas253/SylNet) in its pipeline. The tool estimates the number of linguistic units in utterances from adult speakers only (FEM and MAL classes by VTC). 
+
+Note that it relies on an older version of VTC, and that users with Apple Silicon devices need to execute a few extra commands, as shown below:
 
 ```bash
 cd ~/LONGFORM_TOOLS
 git clone --recurse-submodules https://github.com/orasanen/ALICE.git
 cd ALICE
-conda env create -f ALICE_Linux.yml         # for Linux users
-conda env create -f ALICE_macOS.yml         # for macOS users
+conda env create -f ALICE_Linux.yml         # for Linux / WSL users
+conda env create -f ALICE_macOS.yml         # for macOS users (non Apple Silicon processors)
+# the following commands concern Apple Silicon devices only:
+CONDA_SUBDIR=osx-64 conda env create -f ALICE_macOS.yml
+conda activate ALICE
+conda config --env --set subdir osx-64
 ```
 
 1. Input: As the tool relies on VTC, it receives 16kHz mono-channel .wav audio files as input.
