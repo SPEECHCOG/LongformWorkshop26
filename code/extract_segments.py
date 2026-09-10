@@ -10,7 +10,7 @@ import soundfile as sf
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Chunk audio files according to VTC outputs.')
     parser.add_argument('-r', '--rttm_path', default='data/results/VTC_outputs/rttm.csv', help='RTTM CSV file')
-    parser.add_argument('-a', '--audio_path', default='data/recordings', help='Directory containing wav files')
+    parser.add_argument('-a', '--audio_path', default='data/recordings/wav', help='Directory containing wav files')
     parser.add_argument('-o', '--output_path', default='data/recordings/VTC_segments', help='Output directory')
     parser.add_argument('-k', '--kchi', required=False, action='store_true', help='Inlcude KCHI vocalizations')
     parser.add_argument('-c', '--chi', required=False, action='store_true', help='Inlcude OCH vocalizations')
