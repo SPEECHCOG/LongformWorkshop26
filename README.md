@@ -2,7 +2,9 @@
 
 This repository is a step-by-step tutorial to use long-form analysis tools in practice. If you run into trouble with any of the tools, you might lack some of the required installations. In that case, refer to technical setup files in this repository.
 
-Note: If you lack sudo / admin rights on your computer, some of the installations might not work. 
+NOTE: If you lack sudo / admin rights on your computer, some of the installations might not work. 
+
+DISCLAIMER: This repository serves as an easy introduction to long-form processing tools. We cannot take any responsibility for making the tools work on your devices. If you run into trouble that you cannot solve, please create an issue on the respective tool's GitHub page! For common error messages, we have a trouble shooting section in technical_setup_mac_linux file that you can check out. 
 
 Relevant sections for cloning this repo, installing the example data, or converting your own data:
 
@@ -22,13 +24,13 @@ If you use longform data analaysis tools for your research, please recognize the
 
 ## How to get started
 
-We recommend to store all tools in one directory called LONGFORM_TOOLS located in home directory. In case you use your own folder structure, please avoid directory names that contain space characters (replace f.ex. with underscores). Open a terminal, and create the folder with these commands:
+We recommend to store all tools in one directory called LONGFORM_TOOLS located in home directory. In case you use your own folder structure, please avoid directory names that contain space characters (replace f.ex. with underscores). Open a terminal, navigate to home directory (cd), create the directory (mkdir), and display its contents (ls) with these commands:
 
 ```bash
-cd ~					# navigate to home directory
-mkdir LONGFORM_TOOLS    # create a new folder called "LONGFORM_TOOLS"
-cd LONGFORM_TOOLS       # navigate to empty folder "LONGFORM_TOOLS"
-ls                      # should yield an empty line
+cd ~
+mkdir LONGFORM_TOOLS
+cd LONGFORM_TOOLS
+ls
 ```
 
 ### Repository installation
@@ -36,7 +38,7 @@ ls                      # should yield an empty line
 In general, you can clone any public repository from Github by navigating to its homepage, clicking the green button "Code", copying the HTTPS-key and running "git clone HTTPS-link" (replace "HTTPS-link" with the actual link). Let's get started by cloning [this repository](https://github.com/SPEECHCOG/LongformWorkshop26):
 
 ```bash
-cd ~/LONGFORM_TOOLS		# navigate to directory LONGFORM_TOOLS to place the repository there
+cd ~/LONGFORM_TOOLS
 git clone https://github.com/SPEECHCOG/LongformWorkshop26.git
 ```
 
@@ -45,7 +47,7 @@ git clone https://github.com/SPEECHCOG/LongformWorkshop26.git
 As example data, we use one recording from the publically available [VanDam corpus](https://gin.g-node.org/LAAC-LSCP/vandam-data/src/master). Execute this code in your terminal from LONGFORM_TOOLS directory. Note that this requires FFmpeg since we chunk the downloaded audio file. For installations, refer to the technical_setup files.
 
 ```bash
-cd LongformWorkshop26	# if you cannot find the directory, try: cd ~/LONGFORM_TOOLS/LongformWorkshop26
+cd ~/LONGFORM_TOOLS/LongformWorkshop26
 bash code/data_download.sh
 ```
 
@@ -55,13 +57,13 @@ Note: If you would like to use your own data, please place it into LongformWorks
 
 Note: If you are using the example data, you may skip this part! 
 
-Most of the tools expect the recordings in .wav format with 16kHz sampling rate. To convert your own data into expected formats, we prepared different scripts depending on the input type for you. Make sure your data is located in data/recordings folder, then execute the following lines in your terminal from LongformWorkshop26 directory:
+Most of the tools expect the recordings in .wav format with 16kHz sampling rate. To convert your own data into expected formats, we prepared different scripts depending on the input type for you. Make sure your data is located in data/recordings folder, then execute the first, and one of the following lines in your terminal, depending on your data:
 
 ```bash
 cd ~/LONGFORM_TOOLS/LongformWorkshop26/data/recordings
-bash ../../code/mp4_converter.sh                		# for video to audio (.wav) conversion 
-bash ../../code/mp3_converter.sh						# for .mp3 to .wav conversion
-bash ../../code/wav_converter.sh						# for .wav resampling to 16kHz mono-channel
+bash ../../code/mp4_converter.sh
+bash ../../code/mp3_converter.sh
+bash ../../code/wav_converter.sh
 ```
 
 The scripts create a subdirectory "wav" where they place the converted files.
@@ -75,16 +77,16 @@ Let's get started with the actual data processing! Every section follows the str
 The [Voice Type Classifier](https://github.com/LAAC-LSCP/VTC/tree/main) (VTC) determines who speaks when in an given audio file: It performs segmentation of the recording, classifying the segments where at least one speaker is active into the broad categories of female (FEM), male (MAL), key-child (KCH), and other children's (OCH) speech. Create an output directory first, then install the repository:
 
 ```bash
-cd ~/LONGFORM_TOOLS										# navigate to LONGFORM_TOOLS to place the repository there
-mkdir -p LongformWorkshop26/data/results/VTC_outputs	# create directory for outputs
-git lfs install											
+cd ~/LONGFORM_TOOLS
+mkdir -p LongformWorkshop26/data/results/VTC_outputs
+git lfs install
 git clone --recurse-submodules https://github.com/LAAC-LSCP/VTC.git
-cd VTC													# navigate to VTC folder
-sh check_sys_dependencies.sh							# verify system requirements
+cd VTC
+sh check_sys_dependencies.sh
 uv sync													
 ```
 
-If one of the above commands fails, refer to technical_setup_mac_linux file and follow the installation steps required for VTC.
+NOTE: If one of the above commands fails, please refer to technical_setup_mac_linux file and follow the installation steps required for VTC!
 
 1. Input: VTC receives raw audio files in .wav format as inputs. 
 
@@ -97,26 +99,27 @@ If one of the above commands fails, refer to technical_setup_mac_linux file and 
     - min_duration_on_s: deletes utterances shorter than this threshold during post-processing
     - min_duration_off_s: fills gaps smaller than this threshold between utterances of the same speaker group during post-processing
     - checkpoint: which model checkpoint to use, by default set to the most recent one
-    - batch_size: how many samples to process at a time, by default set to 128
+    - batch_size: internal sample size parameter, does not correspond to number of data samples. set this very low if you are working on your local device!
     - recursive_search: searches recursively for files in waves directory (needed if your data is located in nested subdirectories)
     - high_precision: sets higher higher thresholds for speech detection during inference
     - keep_raw: saves raw (==non-post-processed) outputs to disk
 
-4. Code: To run VTC with default settings on CPU, run this code from VTC directory::
+4. Code: To run VTC with default settings on CPU, run this code. NOTE that we set batch_size to 1, which might be slow. You can try to increase it until you hit your devices memory limit (the process might get killed silently with no outputs).
 
 ```bash
-cd ~/LONGFORM_TOOLS/VTC						# in case you are not in VTC directory, navigate there
-uv run scripts/infer.py --wavs ../LongformWorkshop26/data/recordings/wav --output ../LongformWorkshop26/data/results/VTC_outputs --device cpu
+cd ~/LONGFORM_TOOLS/VTC
+uv run scripts/infer.py --wavs ../LongformWorkshop26/data/recordings/wav --output ../LongformWorkshop26/data/results/VTC_outputs --device cpu --batch_size 1
 ```
 
 Alternatively, you can specify inputs and additional parameters in the bash script that VTC is providing in VTC/scripts/run.sh. For an example, see this repository's examples/VTC_script_example.sh file. 
 
-If you are familiar with Praat or Elan, you can use the rttm_to_eaf_textgrid converter to inspect the results. Note that you need to have conda installed to run the code, and that the argument audio-path is not required, so you may delete it.
+If you are familiar with Praat or Elan, you can use the rttm_to_eaf_textgrid converter to inspect the results. 
+NOTE: You need to have conda installed to run the code (refer to technical_setup_mac_linux if you don't). Also, the argument audio-path is not required, so you may delete it.
 
 ```bash
 cd ~/LONGFORM_TOOLS/LongformWorkshop26
-conda env create -f code/environment.yml	# if you lack conda, refer to technical_setup_mac_linux!
-conda activate longforms                    
+conda env create -f code/environment.yml
+conda activate longforms
 python code/rttm_to_eaf_textgrid.py data/results/VTC_outputs/rttm.csv --audio-path data/recordings/wav --output-path data/annotations/VTC_annotations
 conda deactivate
 ```
@@ -143,22 +146,22 @@ uv sync
     
     In addition, we need to set a few parameters in the file "hparams/hparams.yaml", in section test_dataloader_options:
 
-    - ! batch_size: how many samples to run inference on at once; set to 4 if you use the example data, or to a reasonable small size such that: amount of data % batch_size == as small as possible
+    - ! batch_size: how many samples to run inference on at once; set to 2 if you use the example data, or to a reasonable small size such that: amount of data % batch_size == as small as possible
     - ! num_workers: paralellization mode during data loading; set to 0
     - ! drop_last: whether to drop the last data samples resulting from data % batchsize; set to "True"
 
 4. Code: Before we can run the tool, we need to chunk the long-form audio into utterances based on the VTC outputs. We prepared a small script for that, which requires the conda environment from technical_setup_mac_linux file:
 
 ```bash
-cd ~/LONGFORM_TOOLS/LongformWorkshop26					
-conda activate longforms					# if this command fails, refer to technical_setup and install conda environment
-python code/extract_segments.py	--kchi		# extracts KCHI vocalizations only
+cd ~/LONGFORM_TOOLS/LongformWorkshop26
+conda activate longforms
+python code/extract_segments.py	--kchi		
 ```
 
 Now we navigate back to speech-maturity directory and execute the script that runs the tool:
 
 ```bash
-cd ~/LONGFORM_TOOLS/speech-maturity			# in case you are not in speech-maturity directory, navigate there
+cd ~/LONGFORM_TOOLS/speech-maturity
 bash run.sh
 ```
 
@@ -168,7 +171,7 @@ bash run.sh
 
 ```bash
 cd ~/LONGFORM_TOOLS											
-mkdir -p LongformWorkshop26/data/results/BabAR_outputs		# create output folder 
+mkdir -p LongformWorkshop26/data/results/BabAR_output
 git clone --recurse-submodules https://github.com/MarvinLvn/BabAR.git
 cd BabAR
 uv sync
@@ -196,7 +199,7 @@ uv sync
 4. Code: 
 
 ```bash
-cd ~/LONGFORM_TOOLS/BabAR					# in case you are not in BabAR directory, navigate there
+cd ~/LONGFORM_TOOLS/BabAR
 uv run src/pipeline.py --wavs ../LongformWorkshop26/data/recordings/wav --output ../LongformWorkshop26/data/results/BabAR_outputs --device cpu
 ```
 
@@ -210,9 +213,14 @@ Note that it relies on an older version of VTC, and that users with Apple Silico
 cd ~/LONGFORM_TOOLS
 git clone --recurse-submodules https://github.com/orasanen/ALICE.git
 cd ALICE
-conda env create -f ALICE_Linux.yml         # for Linux / WSL users
-conda env create -f ALICE_macOS.yml         # for macOS users (non Apple Silicon processors)
-# the following commands concern Apple Silicon devices only:
+# for Linux / WSL users
+conda env create -f ALICE_Linux.yml
+# for macOS users (non Apple Silicon processors)
+conda env create -f ALICE_macOS.yml
+```
+
+The following commands concern Apple Silicon devices only:
+```bash
 CONDA_SUBDIR=osx-64 conda env create -f ALICE_macOS.yml
 conda activate ALICE
 conda config --env --set subdir osx-64
@@ -230,10 +238,10 @@ conda config --env --set subdir osx-64
 4. Code: We need to active ALICE environment with required software packages before running the tool:
 
 ```bash
-cd ~/LONGFORM_TOOLS/ALICE					# in case you are not in ALICE directory, navigate there
-conda activate ALICE                       
+cd ~/LONGFORM_TOOLS/ALICE
+conda activate ALICE
 ./run_ALICE.sh ../LongformWorkshop26/data/recordings/wav/
-conda deactivate 
+conda deactivate
 ```
 
 ## Further information
