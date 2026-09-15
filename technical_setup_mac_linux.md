@@ -23,7 +23,7 @@ Close and re-open your terminal, then verify installation:
 which brew
 ```
 
-If you are running into errors, take a look at the [trouble shooting]() section:
+If you are running into errors, take a look at the [trouble shooting](#trouble-shooting) section:
 - common error messages for [VTC](#common-error-messages-for-vtc)
 - common error messages for [Speech Maturity Classifier](#common-error-messages-for-speech-maturity-classifier)
 
