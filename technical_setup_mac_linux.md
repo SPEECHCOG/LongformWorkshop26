@@ -167,4 +167,4 @@ Here, the audio files are not processed. This may be caused by a silent out-of-m
 
 1. "AssertionError: Torch not compiled with CUDA enabled"
 
-This message is raised when the script infer.py is trying to run speech maturity classification with default settings on CUDA (Compute Unified Device Architecture). Open infer.py script in speech maturity/scripts folder with a text editor. Navigate to ~line 313: 'run_opts["device"] = "cuda"  # cpu, cuda, mps', and change it to: run_opts["device"] = "cpu" # cpu, cuda, mps
+This message is raised when the script infer.py is trying to run speech maturity classification with default settings on CUDA (Compute Unified Device Architecture). Open infer.py script in speech maturity/scripts folder with a text editor. Navigate to line 299: 'run_opts["device"] = "cuda"  # cpu, cuda, mps', and change it to: run_opts["device"] = "cpu" # cpu, cuda, mps
