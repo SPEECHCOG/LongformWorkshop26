@@ -126,6 +126,7 @@ DISCLAIMER: This repository serves as an easy introduction to long-form processi
 ### Common error messages for VTC
 
 1. "_pickle.UnpicklingError: invalid load key, 'v'."
+
 This and related error messages can be raised when the model is not properly downloaded, which can be caused by git's large file system not being properly installed. The quickest fix is to install git-lfs, then remove and re-install the repository. 
 
 NOTE: we will remove VTC repository permanantly - if you have any data stored there, save it outside the folder before you execute this code!
@@ -160,9 +161,10 @@ This error message can point to a missing or incompatible FFmpeg installation. F
 "[ERROR] - (1/2) - File BN32_010007_part_1 could not be processed, skipping"
 "[ERROR] - (2/2) - File BN32_010007_part_1 could not be processed, skipping"
 
-Here, the audio files are not processed. This may be caused by a silent out-of-memory error, and can be mitigated by setting the flag "--batch_size 1" in the end of the command.
+Here, the audio files are not processed. This may be caused by a silent out-of-memory error, and can be mitigated by setting the flag "--batch_size 1" in the end of the command. If that does not solve the problem, your audio files might be corrupted.
 
 ### Common error messages for Speech Maturity Classifier
 
 1. "AssertionError: Torch not compiled with CUDA enabled"
-This message is raised when the script infer.py is trying to run speech maturity classification with default settings on CUDA (Compute Unified Device Architecture). Open infer.py script in speech maturity folder with a text editor. Navigate to ~line 313: 'run_opts["device"] = "cuda"  # cpu, cuda, mps', and change it to: run_opts["device"] = "cpu" # cpu, cuda, mps
+
+This message is raised when the script infer.py is trying to run speech maturity classification with default settings on CUDA (Compute Unified Device Architecture). Open infer.py script in speech maturity/scripts folder with a text editor. Navigate to ~line 313: 'run_opts["device"] = "cuda"  # cpu, cuda, mps', and change it to: run_opts["device"] = "cpu" # cpu, cuda, mps
